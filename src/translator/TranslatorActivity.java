@@ -7,6 +7,7 @@ import java.io.InputStreamReader;
 import java.io.ObjectInputStream;
 import java.net.Socket;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -30,6 +31,7 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.EditText;
 import android.widget.TextView;
+import android.widget.Toast;
 import android.widget.TextView.BufferType;
 
 import com.example.plotter.R;
@@ -40,7 +42,7 @@ public class TranslatorActivity extends Activity {
 	private EditText input;
 	private TextView output;
 	String HOST;
-	HashMap<String, HashSet<String>> synonymn;
+	HashMap<String, String[]> synonymn;
 	
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -48,6 +50,7 @@ public class TranslatorActivity extends Activity {
 		setContentView(R.layout.activity_main);
 		HOST = "10.129.26.111";
 		input = (EditText) findViewById(R.id.textInput);
+		input.setText("Hello how are you");
 		output = (TextView) findViewById(R.id.textViewTranslated);
 		Typeface Hindi = Typeface
 				.createFromAsset(getAssets(), "DroidHindi.ttf");
@@ -107,12 +110,19 @@ public class TranslatorActivity extends Activity {
 				Log.d("TEXT :", sentence);
 				outToServer.writeBytes(sentence + '\n');
 				translatedSentence = inFromServer.readLine();
+				
+				//now read the synonyms for each word
+				//Format -> word : syn1, syn2...
 				System.out.println(translatedSentence);
-				ObjectInputStream objIn = new ObjectInputStream(
-						clientSocket.getInputStream());
-				synonymn = ((HashMap<String, HashSet<String>>) objIn
-						.readObject());
-				System.out.println("Here " + synonymn);
+				synonymn = new HashMap<String, String[]>();
+				String synLine = "";
+				while((synLine = inFromServer.readLine()) != null) {
+					String l1[] = synLine.replaceAll("\n", "").split(":");
+					String word = l1[0].trim();
+					String syns[] = l1[1].split(",");
+					synonymn.put(word, syns);
+				}
+				Log.d("Synset : ", synonymn.toString());
 				clientSocket.close();
 			} catch (Exception e) {
 				e.printStackTrace();
@@ -158,19 +168,27 @@ public class TranslatorActivity extends Activity {
 		return new ClickableSpan() {
 			@Override
 			public void onClick(View widget) {
-
+				
 				TextView tv = (TextView) widget;
 				String s = tv
 						.getText()
 						.subSequence(tv.getSelectionStart(),
 								tv.getSelectionEnd()).toString();
+				Log.d("SHOWING SYNS FOR", s);
 				try {
-					HashSet<String> synset = synonymn.get(s);
+					Log.d("MAP :", synonymn.toString());
+					String synset[] = synonymn.get(s);
+					//Log.d("Val :", synset.toString());
+					
 					if (null != synset) {
-						String syns[] = (String[]) synset
-								.toArray(new String[0]);
+						StringBuilder synStr = new StringBuilder();
+						for(String syn : synset) {
+							synStr.append(syn);
+							synStr.append("\n");
+						}
+						Toast.makeText(getApplicationContext(), synStr.toString(), Toast.LENGTH_SHORT).show();
 						/* Set up the drop down list */
-						tv.setText("Clicked");
+						//tv.setText("Clicked");
 					}
 				} catch (NullPointerException npe) {
 					npe.printStackTrace();
