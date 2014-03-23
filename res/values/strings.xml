@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <string name="app_name">NTRS : Naive Translator</string>
+    <string name="action_settings">Settings</string>
+    <string name="hello_world">Hello world!</string>
+    <string name = "button_send">Translate</string>
+    <string name = "hint">Input Sentence in English</string>
+    <string name="pref_hostname">Translator Server Address</string>
+    <string name="pref_hostname_summary">Pick a translation host</string>
+    <string name="menu_settings">Settings</string>
+     <string name="pref_translation_host">Translator</string>
+
+</resources>
