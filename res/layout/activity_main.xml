@@ -44,6 +44,14 @@
         android:textAppearance="?android:attr/textAppearanceMedium"
         android:textColor="@color/Seashell" />
 
-   
+    <TextView
+        android:id="@+id/textViewAlign"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
+        android:layout_alignRight="@+id/translateButton"
+        android:layout_marginBottom="25dp"
+        android:layout_marginRight="32dp"
+        android:text="TextView" />
 
 </RelativeLayout>

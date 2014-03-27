@@ -170,9 +170,10 @@ public final class R {
         public static final int ic_launcher=0x7f020000;
     }
     public static final class id {
-        public static final int action_settings=0x7f0b0003;
-        public static final int menu_settings=0x7f0b0004;
+        public static final int action_settings=0x7f0b0004;
+        public static final int menu_settings=0x7f0b0005;
         public static final int textInput=0x7f0b0000;
+        public static final int textViewAlign=0x7f0b0003;
         public static final int textViewTranslated=0x7f0b0002;
         public static final int translateButton=0x7f0b0001;
     }
