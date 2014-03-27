@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <string-array name="translationType">
+        <item name="d">Dictionary</item>
+        <item name="m">Moses</item>
+    </string-array>
+    <string-array name="translationValues">
+        <item name="d">0</item>
+        <item name="m">1</item>
+    </string-array>
+
+</resources>

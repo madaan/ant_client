@@ -9,5 +9,8 @@
     <string name="pref_hostname">Translator Server Address</string>
     <string name="pref_hostname_summary">Pick a translation host</string>
     <string name="menu_settings">Settings</string>
+    <string name="pref_translation_host">Translator</string>
+    <string name="pref_translation_type">Translation Method</string>
+    <string name="pref_translation_type_summary">Choose a translation</string>
 
 </resources>

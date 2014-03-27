@@ -9,6 +9,8 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
+import com.example.plotter.R;
+
 
 import android.annotation.SuppressLint;
 import android.app.Activity;
@@ -37,6 +39,9 @@ public class TranslatorActivity extends Activity {
 
 	private EditText input;
 	private TextView output;
+	public static final int MOSES_TYPE = 1;
+	public static final int DICT_TYPE = 0;
+	int translationType;
 	String HOST;
 	HashMap<String, String[]> synonymn;
 	
@@ -76,6 +81,8 @@ public class TranslatorActivity extends Activity {
 		Log.d("EVENT", "SENDING EVENT");
 		SharedPreferences sharedPref = PreferenceManager.getDefaultSharedPreferences(this);
 		HOST = sharedPref.getString("pref_hostname", "NULL");
+		translationType = sharedPref.getInt("pref_translation_type", 0);
+		
 		if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.HONEYCOMB) {
 			new TranslateTask()
 					.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
@@ -104,22 +111,33 @@ public class TranslatorActivity extends Activity {
 				// get the numbers fro m the users
 				String sentence = input.getText().toString();
 				Log.d("TEXT :", sentence);
-				outToServer.writeBytes(sentence + '\n');
-				translatedSentence = inFromServer.readLine();
-				
-				//now read the synonyms for each word
-				//Format -> word : syn1, syn2...
-				System.out.println(translatedSentence);
-				synonymn = new HashMap<String, String[]>();
-				String synLine = "";
-				while((synLine = inFromServer.readLine()) != null) {
-					String l1[] = synLine.replaceAll("\n", "").split(":");
-					String word = l1[0].trim();
-					String syns[] = l1[1].split(",");
-					synonymn.put(word, syns);
+				if(translationType == TranslatorActivity.MOSES_TYPE) {
+					Log.d("XLATOR CHOSEN", "Moses");
+					outToServer.writeBytes("MOSES\n");
+					outToServer.writeBytes(sentence + '\n');
+					translatedSentence = inFromServer.readLine();
+					
+				} else if(translationType == TranslatorActivity.DICT_TYPE) {
+					outToServer.writeBytes("DICT\n");
+					outToServer.writeBytes(sentence + '\n');
+					translatedSentence = inFromServer.readLine();
+					
+					//now read the synonyms for each word
+					//Format -> word : syn1, syn2...
+					System.out.println(translatedSentence);
+					synonymn = new HashMap<String, String[]>();
+					String synLine = "";
+					while((synLine = inFromServer.readLine()) != null) {
+						String l1[] = synLine.replaceAll("\n", "").split(":");
+						String word = l1[0].trim();
+						String syns[] = l1[1].split(",");
+						synonymn.put(word, syns);
+					}
+					Log.d("Synset : ", synonymn.toString());
+
 				}
-				Log.d("Synset : ", synonymn.toString());
-				clientSocket.close();
+				
+								clientSocket.close();
 			} catch (Exception e) {
 				e.printStackTrace();
 			}
