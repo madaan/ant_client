@@ -6,6 +6,7 @@
                 android:title="@string/pref_hostname"
                 android:summary="@string/pref_hostname_summary"
                 android:key="pref_hostname"/>
+
     </PreferenceCategory>
      
    
