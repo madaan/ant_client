@@ -10,6 +10,7 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 
+import android.R.integer;
 import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.app.Dialog;
@@ -21,6 +22,7 @@ import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
+import android.text.Html;
 import android.text.Spannable;
 import android.text.TextPaint;
 import android.text.method.LinkMovementMethod;
@@ -35,6 +37,7 @@ import android.widget.TextView.BufferType;
 import android.widget.Toast;
 
 import com.example.plotter.R;
+import com.example.plotter.R.color;
 
 @SuppressLint("InlinedApi")
 public class TranslatorActivity extends Activity {
@@ -100,17 +103,18 @@ public class TranslatorActivity extends Activity {
 
 	class TranslateTask extends AsyncTask<String, String, String> {
 
-		 @Override
-		    protected void onPreExecute() {
-		        super.onPreExecute();
-		        showDialog(DIALOG_DOWNLOAD_PROGRESS);
-		    }
-		 
+		@Override
+		protected void onPreExecute() {
+			super.onPreExecute();
+			showDialog(DIALOG_DOWNLOAD_PROGRESS);
+		}
+
 		protected String doInBackground(String... v) {
 			final int PORT = 1234;
 
 			Log.d("SENDING", "SENDING REQUEST");
-			 publishProgress("" + 10);
+			Log.d("HOST : ", HOST);
+			publishProgress("" + 10);
 			String translatedSentence = "";
 
 			try {
@@ -130,10 +134,7 @@ public class TranslatorActivity extends Activity {
 					outToServer.writeBytes(sentence + '\n');
 					translatedSentence = inFromServer.readLine();
 					publishProgress("" + 50);
-					StringBuilder sbr = new StringBuilder();
 					String inputWords[] = sentence.split(" ");
-					HashMap<Integer, String> ipAlignMap = new HashMap<Integer, String>();
-					HashMap<Integer, String> translateAlignMap = new HashMap<Integer, String>();
 					alignedPair = new ArrayList<String>();
 					StringBuilder selectionBuilder = new StringBuilder();
 					StringBuilder justTranslation = new StringBuilder();
@@ -174,7 +175,8 @@ public class TranslatorActivity extends Activity {
 					}
 					publishProgress("" + 70);
 					Log.d("XLATION : ", translatedSentence);
-					//translatedSentence = justTranslation.toString();
+					translatedSentence = justTranslation.toString();
+					Log.d("XLATION : ", translatedSentence);
 
 				} // end MOSES
 				else if (translationType == TranslatorActivity.DICT_TYPE) {
@@ -204,11 +206,11 @@ public class TranslatorActivity extends Activity {
 			}
 			return translatedSentence;
 		}
-		
-		protected void onProgressUpdate(String... progress) {        
-		    mProgressDialog.setProgress(Integer.parseInt(progress[0]));
+
+		protected void onProgressUpdate(String... progress) {
+			mProgressDialog.setProgress(Integer.parseInt(progress[0]));
 		}
-		
+
 		protected void onPostExecute(final String translatedSentence) {
 			runOnUiThread(new Runnable() {
 				@Override
@@ -220,19 +222,37 @@ public class TranslatorActivity extends Activity {
 						initClickableWords(translatedSentence);
 						align.setText("");
 					} else if (translationType == TranslatorActivity.MOSES_TYPE) {
-							
-							output.setText(translatedSentence, BufferType.SPANNABLE);
-							output.setMovementMethod(LinkMovementMethod
-									.getInstance());
-							//align.setText(alignedPair.toString());
+						Log.d("YES!!!", "I DO COME HERE");
+						String colors[] = {"Red", "Orange", "Yellow", "Green", "Blue"};
+						output.setText(translatedSentence, BufferType.SPANNABLE);
+						output.setMovementMethod(LinkMovementMethod
+								.getInstance());
+						
+						StringBuilder ori = new StringBuilder();
+						StringBuilder trans = new StringBuilder();
+						String fontS = "<font color=";
+						
+						String fontE = "</font>";
+						int colorNum = 0;
+						
+						for (String apair : alignedPair) {
+							String pair[] = apair.split("=");
+							String fontC = "'" + colors[colorNum] +"'>";
+							colorNum++;
+							colorNum = colorNum % colors.length;
+							ori.append(fontS + fontC + pair[0] + fontE + " ");
+							trans.append(fontS + fontC + pair[1] + fontE + " ");
+						}
+						Log.d("Colored : ", ori.toString());
+						align.setText(Html.fromHtml(ori.toString() + "<br/>" + trans.toString()), TextView.BufferType.SPANNABLE);
 					}
 
 				}
 			});
-			 dismissDialog(DIALOG_DOWNLOAD_PROGRESS);
+			dismissDialog(DIALOG_DOWNLOAD_PROGRESS);
 
 		}
-	
+
 	}
 
 	void initClickableWords(String str) {
@@ -301,22 +321,23 @@ public class TranslatorActivity extends Activity {
 		}
 		return (Integer[]) indices.toArray(new Integer[0]);
 	}
+
 	public static final int DIALOG_DOWNLOAD_PROGRESS = 0;
 	private ProgressDialog mProgressDialog;
 
 	@Override
 	protected Dialog onCreateDialog(int id) {
-	    switch (id) {
-	    case DIALOG_DOWNLOAD_PROGRESS:
-	        mProgressDialog = new ProgressDialog(this);
-	        mProgressDialog.setMessage("Getting your translation");
-	        mProgressDialog.setProgressStyle(ProgressDialog.STYLE_HORIZONTAL);
-	        mProgressDialog.setCancelable(false);
-	        mProgressDialog.show();
-	        return mProgressDialog;
-	    default:
-	    return null;
-	    }
+		switch (id) {
+		case DIALOG_DOWNLOAD_PROGRESS:
+			mProgressDialog = new ProgressDialog(this);
+			mProgressDialog.setMessage("Getting your translation");
+			mProgressDialog.setProgressStyle(ProgressDialog.STYLE_HORIZONTAL);
+			mProgressDialog.setCancelable(false);
+			mProgressDialog.show();
+			return mProgressDialog;
+		default:
+			return null;
+		}
 	}
 
 }
