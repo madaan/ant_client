@@ -10,7 +10,8 @@ import com.example.plotter.R;
 
 
 public class TranslationPreference extends PreferenceActivity {
-	  @Override
+	  @SuppressWarnings("deprecation")
+	@Override
 	    public void onCreate(Bundle savedInstanceState) {
 	        super.onCreate(savedInstanceState);
 	        addPreferencesFromResource(R.xml.preferences);

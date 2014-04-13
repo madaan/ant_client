@@ -10,7 +10,6 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 
-import android.R.integer;
 import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.app.Dialog;
@@ -31,13 +30,13 @@ import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.TextView.BufferType;
 import android.widget.Toast;
 
 import com.example.plotter.R;
-import com.example.plotter.R.color;
 
 @SuppressLint("InlinedApi")
 public class TranslatorActivity extends Activity {
@@ -48,35 +47,44 @@ public class TranslatorActivity extends Activity {
 	public static final int DICT_TYPE = 0;
 	int translationType;
 	String HOST;
+	Typeface hindiTypeface;
 	ArrayList<String> alignedPair;
 	HashMap<String, String[]> synonymn;
-
+	Button translateButton;
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_main);
-		HOST = "10.129.26.111";
+		HOST = "10.0.2.2";
 		input = (EditText) findViewById(R.id.textInput);
-		align = (TextView)findViewById(R.id.textViewAlign);
+		align = (TextView) findViewById(R.id.textViewAlign);
+		translateButton = (Button) findViewById(R.id.translateButton);
+		
 		input.setText("Hello how are you");
 		output = (TextView) findViewById(R.id.textViewTranslated);
-		Typeface Hindi = Typeface
-				.createFromAsset(getAssets(), "DroidHindi.ttf");
-		output.setTypeface(Hindi);
+		hindiTypeface = Typeface.createFromAsset(getAssets(), "DroidHindi.ttf");
+		translateButton.setTypeface(hindiTypeface);
+		output.setTypeface(hindiTypeface);
 	}
 
 	@Override
 	public boolean onCreateOptionsMenu(Menu menu) {
 		// Inflate the menu; this adds items to the action bar if it is present.
 		getMenuInflater().inflate(R.menu.settings, menu);
-		return true;
+		getMenuInflater().inflate(R.menu.cached, menu);
+		return true;	
 	}
 
 	@Override
 	public boolean onOptionsItemSelected(MenuItem item) {
+		Intent i = null;
 		switch (item.getItemId()) {
 		case R.id.menu_settings:
-			Intent i = new Intent(this, prefs.TranslationPreference.class);
+			i = new Intent(this, prefs.TranslationPreference.class);
+			startActivity(i);
+			break;
+		case R.id.stored_translations:
+			i = new Intent(this, caching.ShowCachedActivity.class);
 			startActivity(i);
 			break;
 		}
@@ -103,6 +111,7 @@ public class TranslatorActivity extends Activity {
 
 	class TranslateTask extends AsyncTask<String, String, String> {
 
+		@SuppressWarnings("deprecation")
 		@Override
 		protected void onPreExecute() {
 			super.onPreExecute();
@@ -211,6 +220,7 @@ public class TranslatorActivity extends Activity {
 			mProgressDialog.setProgress(Integer.parseInt(progress[0]));
 		}
 
+		@SuppressWarnings("deprecation")
 		protected void onPostExecute(final String translatedSentence) {
 			runOnUiThread(new Runnable() {
 				@Override
@@ -223,28 +233,35 @@ public class TranslatorActivity extends Activity {
 						align.setText("");
 					} else if (translationType == TranslatorActivity.MOSES_TYPE) {
 						Log.d("YES!!!", "I DO COME HERE");
-						String colors[] = {"Red", "Orange", "Yellow", "Green", "Blue"};
+						String colors[] = { "Red", "Orange", "Yellow", "Green",
+								"Blue" };
 						output.setText(translatedSentence, BufferType.SPANNABLE);
 						output.setMovementMethod(LinkMovementMethod
 								.getInstance());
-						
+
 						StringBuilder ori = new StringBuilder();
 						StringBuilder trans = new StringBuilder();
 						String fontS = "<font color=";
-						
+
 						String fontE = "</font>";
 						int colorNum = 0;
-						
+
 						for (String apair : alignedPair) {
 							String pair[] = apair.split("=");
-							String fontC = "'" + colors[colorNum] +"'>";
+							String fontC = "'" + colors[colorNum] + "'>";
 							colorNum++;
 							colorNum = colorNum % colors.length;
 							ori.append(fontS + fontC + pair[0] + fontE + " ");
 							trans.append(fontS + fontC + pair[1] + fontE + " ");
 						}
 						Log.d("Colored : ", ori.toString());
-						align.setText(Html.fromHtml(ori.toString() + "<br/>" + trans.toString()), TextView.BufferType.SPANNABLE);
+						align.setText(
+								Html.fromHtml("अनुवाद :   <b>"
+										+ translatedSentence
+										+ "</b><br/><br/> <b>प्रक्रिया जानिए : </b> <br/>"
+										+ ori.toString() + "<br/>"
+										+ trans.toString()),
+								TextView.BufferType.SPANNABLE);
 					}
 
 				}
