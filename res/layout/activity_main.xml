@@ -10,7 +10,6 @@
     tools:context=".TranslatorActivity" >
 
     <EditText
-        android:inputType="textMultiLine"
         android:id="@+id/textInput"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
@@ -18,20 +17,13 @@
         android:layout_alignParentRight="true"
         android:layout_marginTop="56dp"
         android:ems="10"
-        android:hint="@string/hint" >
+        android:hint="@string/hint"
+        android:inputType="textMultiLine" 
+        >
 
         <requestFocus />
     </EditText>
-    <Button
-        android:id="@+id/translateButton"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_below="@+id/textInput"
-        android:layout_centerHorizontal="true"
-        android:layout_marginTop="84dp"
-        android:background="@color/Snow"
-        android:onClick="translateButtonPressed"
-        android:text="@string/button_send" />
+
     <TextView
         android:id="@+id/textViewTranslated"
         android:layout_width="wrap_content"
@@ -48,9 +40,31 @@
         android:id="@+id/textViewAlign"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_alignBottom="@+id/textViewTranslated"
-        android:layout_alignLeft="@+id/translateButton"
-        android:textSize="24sp"
-         />
+        android:layout_alignLeft="@+id/textInput"
+        android:layout_alignRight="@+id/textInput"
+        android:layout_below="@+id/translateButton"
+        android:textSize="20sp" />
+
+    <Button
+        android:id="@+id/translateButton"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/textInput"
+        android:layout_centerHorizontal="true"
+        android:layout_marginTop="22dp"
+        android:background="@color/PowderBlue"
+        android:onClick="translateButtonPressed"
+        android:text="@string/button_send" />
+
+    <Button
+        android:id="@+id/speakButton"
+        style="?android:attr/buttonStyleSmall"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignBaseline="@+id/translateButton"
+        android:onClick="speakOut"
+        android:layout_alignBottom="@+id/translateButton"
+        android:layout_alignRight="@+id/textViewAlign"
+     />
 
 </RelativeLayout>

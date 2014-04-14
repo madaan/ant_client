@@ -9,6 +9,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Locale;
 
 import android.annotation.SuppressLint;
 import android.app.Activity;
@@ -21,6 +22,8 @@ import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
+import android.speech.tts.TextToSpeech;
+import android.speech.tts.TextToSpeech.OnInitListener;
 import android.text.Html;
 import android.text.Spannable;
 import android.text.TextPaint;
@@ -35,13 +38,20 @@ import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.TextView.BufferType;
 import android.widget.Toast;
+import caching.CachedTranslation;
+import caching.ShowCachedActivity;
+import caching.TranslationCachingHandler;
 
 import com.example.plotter.R;
 
 @SuppressLint("InlinedApi")
-public class TranslatorActivity extends Activity {
-
+public class TranslatorActivity extends Activity implements OnInitListener {
+	
+	private TextToSpeech tts;
 	private EditText input;
+	TranslationCachingHandler tch;
+	String currEnglish;
+	String currHindi;
 	private TextView output, align;
 	public static final int MOSES_TYPE = 1;
 	public static final int DICT_TYPE = 0;
@@ -51,20 +61,26 @@ public class TranslatorActivity extends Activity {
 	ArrayList<String> alignedPair;
 	HashMap<String, String[]> synonymn;
 	Button translateButton;
+	Button speakButton;
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_main);
+		tts = new TextToSpeech(getApplicationContext(), this);
+		tch = new TranslationCachingHandler(getApplicationContext());
 		HOST = "10.0.2.2";
 		input = (EditText) findViewById(R.id.textInput);
 		align = (TextView) findViewById(R.id.textViewAlign);
 		translateButton = (Button) findViewById(R.id.translateButton);
-		
 		input.setText("Hello how are you");
 		output = (TextView) findViewById(R.id.textViewTranslated);
 		hindiTypeface = Typeface.createFromAsset(getAssets(), "DroidHindi.ttf");
 		translateButton.setTypeface(hindiTypeface);
 		output.setTypeface(hindiTypeface);
+		speakButton = (Button) findViewById(R.id.speakButton);
+		speakButton.setTypeface(hindiTypeface);
+		speakButton.setEnabled(false);
+		speakButton.setText("सुने ");
 	}
 
 	@Override
@@ -72,6 +88,7 @@ public class TranslatorActivity extends Activity {
 		// Inflate the menu; this adds items to the action bar if it is present.
 		getMenuInflater().inflate(R.menu.settings, menu);
 		getMenuInflater().inflate(R.menu.cached, menu);
+		getMenuInflater().inflate(R.menu.add_translation, menu);
 		return true;	
 	}
 
@@ -84,9 +101,29 @@ public class TranslatorActivity extends Activity {
 			startActivity(i);
 			break;
 		case R.id.stored_translations:
-			i = new Intent(this, caching.ShowCachedActivity.class);
+			i = new Intent(this, ShowCachedActivity.class);
 			startActivity(i);
 			break;
+		case R.id.add_translation:
+			if(currEnglish == null || currHindi == null) {
+				Toast err = new Toast(getApplicationContext());
+				TextView tr = new TextView(getApplicationContext());
+				tr.setTypeface(hindiTypeface);
+				tr.setText("पहले अनुवाद तो कीजिए!");
+				err.setView(tr);
+				err.setDuration(Toast.LENGTH_SHORT);
+				err.show();
+			} else {
+				tch.addTranslation(new CachedTranslation(currEnglish, currHindi));
+				Toast msg = new Toast(getApplicationContext());
+				TextView tr = new TextView(getApplicationContext());
+				tr.setTypeface(hindiTypeface);
+				tr.setText("अनुवाद संग्रहित!");
+				msg.setView(tr);
+				msg.setDuration(Toast.LENGTH_SHORT);
+				msg.show();
+			}
+			
 		}
 		return true;
 	}
@@ -135,6 +172,7 @@ public class TranslatorActivity extends Activity {
 
 				// get the numbers from the users
 				String sentence = input.getText().toString();
+				currEnglish = new String(sentence);
 				Log.d("TEXT :", sentence);
 				publishProgress("" + 20);
 				if (translationType == TranslatorActivity.MOSES_TYPE) {
@@ -195,7 +233,7 @@ public class TranslatorActivity extends Activity {
 					publishProgress("" + 50);
 					// now read the synonyms for each word
 					// Format -> word : syn1, syn2...
-					System.out.println(translatedSentence);
+					Log.d("XLATION : ", translatedSentence);
 					synonymn = new HashMap<String, String[]>();
 					String synLine = "";
 					while ((synLine = inFromServer.readLine()) != null) {
@@ -213,6 +251,7 @@ public class TranslatorActivity extends Activity {
 			} catch (Exception e) {
 				e.printStackTrace();
 			}
+			currHindi = translatedSentence;
 			return translatedSentence;
 		}
 
@@ -223,8 +262,10 @@ public class TranslatorActivity extends Activity {
 		@SuppressWarnings("deprecation")
 		protected void onPostExecute(final String translatedSentence) {
 			runOnUiThread(new Runnable() {
+				
 				@Override
 				public void run() {
+				
 					if (translationType == TranslatorActivity.DICT_TYPE) {
 						output.setText(translatedSentence, BufferType.SPANNABLE);
 						output.setMovementMethod(LinkMovementMethod
@@ -356,5 +397,29 @@ public class TranslatorActivity extends Activity {
 			return null;
 		}
 	}
+
+	@Override
+	public void onInit(int status) {
+		if (status == TextToSpeech.SUCCESS) {
+			 
+            int result = tts.setLanguage(Locale.US);
+ 
+            if (result == TextToSpeech.LANG_MISSING_DATA
+                    || result == TextToSpeech.LANG_NOT_SUPPORTED) {
+                Log.e("TTS", "This Language is not supported");
+            } else {
+                speakButton.setEnabled(true);
+            }
+ 
+        } else {
+            Log.e("TTS", "Initilization Failed!");
+        }
+		
+	}
+	
+	public void speakOut(View v) {
+		String sentence = input.getText().toString();
+		tts.speak(sentence, TextToSpeech.QUEUE_FLUSH, null);
+	    }
 
 }

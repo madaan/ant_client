@@ -170,23 +170,31 @@ public final class R {
         public static final int ic_launcher=0x7f020000;
     }
     public static final class id {
-        public static final int action_settings=0x7f0b0004;
-        public static final int menu_settings=0x7f0b0005;
+        public static final int action_settings=0x7f0b0008;
+        public static final int add_translation=0x7f0b0006;
+        public static final int cache=0x7f0b0005;
+        public static final int menu_settings=0x7f0b0009;
+        public static final int speakButton=0x7f0b0004;
+        public static final int stored_translations=0x7f0b0007;
         public static final int textInput=0x7f0b0000;
         public static final int textViewAlign=0x7f0b0003;
-        public static final int textViewTranslated=0x7f0b0002;
-        public static final int translateButton=0x7f0b0001;
+        public static final int textViewTranslated=0x7f0b0001;
+        public static final int translateButton=0x7f0b0002;
     }
     public static final class layout {
         public static final int activity_main=0x7f030000;
         public static final int list_item=0x7f030001;
+        public static final int show_cached=0x7f030002;
     }
     public static final class menu {
-        public static final int main=0x7f0a0000;
-        public static final int settings=0x7f0a0001;
+        public static final int add_translation=0x7f0a0000;
+        public static final int cached=0x7f0a0001;
+        public static final int main=0x7f0a0002;
+        public static final int settings=0x7f0a0003;
     }
     public static final class string {
         public static final int action_settings=0x7f080001;
+        public static final int add_translation=0x7f08000c;
         public static final int app_name=0x7f080000;
         public static final int button_send=0x7f080003;
         public static final int hello_world=0x7f080002;
@@ -197,6 +205,7 @@ public final class R {
         public static final int pref_translation_host=0x7f080008;
         public static final int pref_translation_type=0x7f080009;
         public static final int pref_translation_type_summary=0x7f08000a;
+        public static final int stored_translation=0x7f08000b;
     }
     public static final class style {
         /** 

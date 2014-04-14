@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <!--string name="app_name">CS712 : SMS Translator</string>
+    <string name="action_settings">विधि चुनाव</string>
+    <string name="hello_world">Hello world!</string>
+    <string name="button_send">अनुवाद</string>
+    <string name="hint">अनुवाद के लिए अंग्रेजी में वाक्य लिखें</string>
+    <string name="pref_hostname">अनुवादक चुने</string>
+    <string name="pref_hostname_summary">अनुवादक चुने</string>
+    <string name="menu_settings">Settings</string>
+    <string name="pref_translation_host">Translator</string>
+    <string name="pref_translation_type">अनुवाद विधि</string>
+    <string name="pref_translation_type_summary">Choose a translation</string>
+    <string name="stored_translation">संग्रहित अनुवाद</string-->
+    
+</resources>

@@ -5,10 +5,20 @@ package caching;
  * @author aman
  *
  */
-public class Translation {
+public class CachedTranslation {
 	String english;
 	String hindi;
+	static int idcounter;
 	int id;
+	public CachedTranslation() {
+		
+	}
+	public CachedTranslation(String english, String hindi) {
+		this.english = english;
+		this.hindi = hindi;
+		this.id = CachedTranslation.idcounter + 1;
+		CachedTranslation.idcounter++;
+	}
 	public String getEnglish() {
 		return english;
 	}

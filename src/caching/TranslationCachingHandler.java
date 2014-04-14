@@ -9,7 +9,7 @@ import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 
-public class TranslationHandler extends SQLiteOpenHelper {
+public class TranslationCachingHandler extends SQLiteOpenHelper {
 	// All Static variables
 	// Database Version
 	private static final int DATABASE_VERSION = 1;
@@ -28,13 +28,16 @@ public class TranslationHandler extends SQLiteOpenHelper {
 	private static final int ENG_INDEX = 1;
 	private static final int HINDI_INDEX = 2;
 
-	public TranslationHandler(Context context) {
+	public TranslationCachingHandler(Context context) {
 		super(context, DATABASE_NAME, null, DATABASE_VERSION);
 	}
 
 	// Creating Tables
 	@Override
 	public void onCreate(SQLiteDatabase db) {
+		db.execSQL("DROP TABLE IF EXISTS " + TABLE_TRANSLATIONS);
+
+		
 		String CREATE_TranslationS_TABLE = "CREATE TABLE " + TABLE_TRANSLATIONS
 				+ "(" + KEY_ID + " INTEGER PRIMARY KEY," + KEY_ENG + " TEXT,"
 				+ KEY_HINDI + " TEXT" + ")";
@@ -54,7 +57,8 @@ public class TranslationHandler extends SQLiteOpenHelper {
 	/**
 	 * Add a new translation to the database
 	 */
-	public void addTranslation(Translation t) {
+	public void addTranslation(CachedTranslation t) {
+
 		SQLiteDatabase db = this.getWritableDatabase();
 		ContentValues values = new ContentValues();
 		values.put(KEY_ENG, t.getEnglish()); // Translation Name
@@ -69,8 +73,8 @@ public class TranslationHandler extends SQLiteOpenHelper {
 	 * 
 	 * @return
 	 */
-	public ArrayList<Translation> getAllTranslations() {
-		ArrayList<Translation> TranslationList = new ArrayList<Translation>();
+	public ArrayList<CachedTranslation> getAllTranslations() {
+		ArrayList<CachedTranslation> TranslationList = new ArrayList<CachedTranslation>();
 		// Select All Query
 		String selectQuery = "SELECT  * FROM " + TABLE_TRANSLATIONS;
 
@@ -80,7 +84,7 @@ public class TranslationHandler extends SQLiteOpenHelper {
 		// looping through all rows and adding to list
 		if (cursor.moveToFirst()) {
 			do {
-				Translation Translation = new Translation();
+				CachedTranslation Translation = new CachedTranslation();
 				Translation.setId(Integer.parseInt(cursor.getString(0)));
 				Translation.setEnglish(cursor.getString(ENG_INDEX));
 				Translation.setHindi(cursor.getString(HINDI_INDEX));
