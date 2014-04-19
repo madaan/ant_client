@@ -9,6 +9,8 @@ package com.example.plotter;
 
 public final class R {
     public static final class array {
+        public static final int speechSpeed=0x7f050002;
+        public static final int speechSpeedValues=0x7f050003;
         public static final int translationType=0x7f050000;
         public static final int translationValues=0x7f050001;
     }
@@ -193,6 +195,8 @@ public final class R {
         public static final int settings=0x7f0a0003;
     }
     public static final class string {
+        public static final int _0dp=0x7f08000f;
+        public static final int _1=0x7f080010;
         public static final int action_settings=0x7f080001;
         public static final int add_translation=0x7f08000c;
         public static final int app_name=0x7f080000;
@@ -205,6 +209,8 @@ public final class R {
         public static final int pref_translation_host=0x7f080008;
         public static final int pref_translation_type=0x7f080009;
         public static final int pref_translation_type_summary=0x7f08000a;
+        public static final int speech_speed=0x7f08000d;
+        public static final int speech_speed_summary=0x7f08000e;
         public static final int stored_translation=0x7f08000b;
     }
     public static final class style {

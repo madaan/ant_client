@@ -14,5 +14,9 @@
     <string name="pref_translation_type_summary">Choose a translation</string>
     <string name="stored_translation">Stored Translations</string>
     <string name="add_translation">Add Translation</string>
+    <string name="speech_speed">Speed of Speech</string>
+    <string name="speech_speed_summary">Set to slow for clearer listening</string>
+    <string name="_0dp">0dp</string>
+    <string name="_1">1</string>
     
 </resources>

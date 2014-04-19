@@ -13,6 +13,13 @@
             android:key="pref_translation_type"
             android:summary="@string/pref_translation_type_summary"
             android:title="@string/pref_translation_type" />
+        
+            <ListPreference
+            android:entries="@array/speechSpeed"
+            android:entryValues="@array/speechSpeedValues"
+            android:key="speech_speed"
+            android:summary="@string/speech_speed_summary"
+            android:title="@string/speech_speed" />
     </PreferenceCategory>
 
 </PreferenceScreen>

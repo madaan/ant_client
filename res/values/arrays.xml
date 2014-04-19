@@ -9,5 +9,16 @@
         <item name="d">0</item>
         <item name="m">1</item>
     </string-array>
+    
+        <string-array name="speechSpeed">
+        <item name="s">Slow</item>
+        <item name="n">Normal</item>
+        <item name="f">Fast</item>
+    </string-array>
+    <string-array name="speechSpeedValues">
+        <item name="s">0.5</item>
+        <item name="b">1</item>
+        <item name="f">2</item>
+    </string-array>
 
 </resources>
