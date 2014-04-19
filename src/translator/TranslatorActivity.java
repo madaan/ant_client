@@ -44,14 +44,15 @@ import caching.TranslationCachingHandler;
 
 import com.example.plotter.R;
 
-@SuppressLint("InlinedApi")
+@SuppressLint({ "InlinedApi", "NewApi" })
 public class TranslatorActivity extends Activity implements OnInitListener {
-	
+
 	private TextToSpeech tts;
 	private EditText input;
 	TranslationCachingHandler tch;
 	String currEnglish;
 	String currHindi;
+	String currNormed;
 	private TextView output, align;
 	public static final int MOSES_TYPE = 1;
 	public static final int DICT_TYPE = 0;
@@ -62,6 +63,7 @@ public class TranslatorActivity extends Activity implements OnInitListener {
 	HashMap<String, String[]> synonymn;
 	Button translateButton;
 	Button speakButton;
+
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
@@ -72,7 +74,7 @@ public class TranslatorActivity extends Activity implements OnInitListener {
 		input = (EditText) findViewById(R.id.textInput);
 		align = (TextView) findViewById(R.id.textViewAlign);
 		translateButton = (Button) findViewById(R.id.translateButton);
-		input.setText("Hello how are you");
+		input.setText("we r meeting 2nite ?");
 		output = (TextView) findViewById(R.id.textViewTranslated);
 		hindiTypeface = Typeface.createFromAsset(getAssets(), "DroidHindi.ttf");
 		translateButton.setTypeface(hindiTypeface);
@@ -89,7 +91,7 @@ public class TranslatorActivity extends Activity implements OnInitListener {
 		getMenuInflater().inflate(R.menu.settings, menu);
 		getMenuInflater().inflate(R.menu.cached, menu);
 		getMenuInflater().inflate(R.menu.add_translation, menu);
-		return true;	
+		return true;
 	}
 
 	@Override
@@ -105,7 +107,7 @@ public class TranslatorActivity extends Activity implements OnInitListener {
 			startActivity(i);
 			break;
 		case R.id.add_translation:
-			if(currEnglish == null || currHindi == null) {
+			if (currEnglish == null || currHindi == null) {
 				Toast err = new Toast(getApplicationContext());
 				TextView tr = new TextView(getApplicationContext());
 				tr.setTypeface(hindiTypeface);
@@ -114,7 +116,7 @@ public class TranslatorActivity extends Activity implements OnInitListener {
 				err.setDuration(Toast.LENGTH_SHORT);
 				err.show();
 			} else {
-				tch.addTranslation(new CachedTranslation(currEnglish, currHindi));
+				tch.addTranslation(new CachedTranslation(currNormed, currHindi));
 				Toast msg = new Toast(getApplicationContext());
 				TextView tr = new TextView(getApplicationContext());
 				tr.setTypeface(hindiTypeface);
@@ -123,7 +125,7 @@ public class TranslatorActivity extends Activity implements OnInitListener {
 				msg.setDuration(Toast.LENGTH_SHORT);
 				msg.show();
 			}
-			
+
 		}
 		return true;
 	}
@@ -175,13 +177,21 @@ public class TranslatorActivity extends Activity implements OnInitListener {
 				currEnglish = new String(sentence);
 				Log.d("TEXT :", sentence);
 				publishProgress("" + 20);
+				int SCORE_INDEX = 0;
+				int XLATION_INDEX = 2;
+				int NORMED_INDEX = 1;
 				if (translationType == TranslatorActivity.MOSES_TYPE) {
 					Log.d("XLATOR CHOSEN", "Moses");
 					outToServer.writeBytes("MOSES\n");
 					outToServer.writeBytes(sentence + '\n');
-					translatedSentence = inFromServer.readLine();
+
+					String inp[] = inFromServer.readLine().split("##");
+					translatedSentence = inp[XLATION_INDEX];
+					currNormed = inp[NORMED_INDEX];
+					double score = Double.parseDouble(inp[SCORE_INDEX]);
+					Log.d("Got from server :", inp[0]);
 					publishProgress("" + 50);
-					String inputWords[] = sentence.split(" ");
+					String inputWords[] = currNormed.split(" ");
 					alignedPair = new ArrayList<String>();
 					StringBuilder selectionBuilder = new StringBuilder();
 					StringBuilder justTranslation = new StringBuilder();
@@ -262,10 +272,10 @@ public class TranslatorActivity extends Activity implements OnInitListener {
 		@SuppressWarnings("deprecation")
 		protected void onPostExecute(final String translatedSentence) {
 			runOnUiThread(new Runnable() {
-				
+
 				@Override
 				public void run() {
-				
+
 					if (translationType == TranslatorActivity.DICT_TYPE) {
 						output.setText(translatedSentence, BufferType.SPANNABLE);
 						output.setMovementMethod(LinkMovementMethod
@@ -273,9 +283,9 @@ public class TranslatorActivity extends Activity implements OnInitListener {
 						initClickableWords(translatedSentence);
 						align.setText("");
 					} else if (translationType == TranslatorActivity.MOSES_TYPE) {
+						input.setText(currNormed);
 						Log.d("YES!!!", "I DO COME HERE");
-						String colors[] = { "Red", "Orange", "Yellow", "Green",
-								"Blue" };
+						String colors[] = { "Red", "Orange", "Green", "Blue", "Gray", "Purple", "Magenta", "Aqua", "Pink" };
 						output.setText(translatedSentence, BufferType.SPANNABLE);
 						output.setMovementMethod(LinkMovementMethod
 								.getInstance());
@@ -401,25 +411,30 @@ public class TranslatorActivity extends Activity implements OnInitListener {
 	@Override
 	public void onInit(int status) {
 		if (status == TextToSpeech.SUCCESS) {
-			 
-            int result = tts.setLanguage(Locale.US);
- 
-            if (result == TextToSpeech.LANG_MISSING_DATA
-                    || result == TextToSpeech.LANG_NOT_SUPPORTED) {
-                Log.e("TTS", "This Language is not supported");
-            } else {
-                speakButton.setEnabled(true);
-            }
- 
-        } else {
-            Log.e("TTS", "Initilization Failed!");
-        }
-		
+
+			int result = tts.setLanguage(Locale.US);
+
+			if (result == TextToSpeech.LANG_MISSING_DATA
+					|| result == TextToSpeech.LANG_NOT_SUPPORTED) {
+				Log.e("TTS", "This Language is not supported");
+			} else {
+				speakButton.setEnabled(true);
+			}
+
+		} else {
+			Log.e("TTS", "Initilization Failed!");
+		}
+
 	}
-	
+
 	public void speakOut(View v) {
 		String sentence = input.getText().toString();
+		SharedPreferences sharedPref = PreferenceManager
+				.getDefaultSharedPreferences(this);
+		float speed = Float.parseFloat(sharedPref.getString("speech_speed",
+				"1.0"));
+		tts.setSpeechRate(speed);
 		tts.speak(sentence, TextToSpeech.QUEUE_FLUSH, null);
-	    }
+	}
 
 }
