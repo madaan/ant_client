@@ -35,6 +35,7 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.TextView.BufferType;
 import android.widget.Toast;
@@ -48,6 +49,7 @@ import com.example.plotter.R;
 public class TranslatorActivity extends Activity implements OnInitListener {
 
 	private TextToSpeech tts;
+	private ProgressBar scoreBar;
 	private EditText input;
 	TranslationCachingHandler tch;
 	String currEnglish;
@@ -58,6 +60,7 @@ public class TranslatorActivity extends Activity implements OnInitListener {
 	public static final int DICT_TYPE = 0;
 	int translationType;
 	String HOST;
+	double currScore;
 	Typeface hindiTypeface;
 	ArrayList<String> alignedPair;
 	HashMap<String, String[]> synonymn;
@@ -69,10 +72,12 @@ public class TranslatorActivity extends Activity implements OnInitListener {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_main);
 		tts = new TextToSpeech(getApplicationContext(), this);
+
 		tch = new TranslationCachingHandler(getApplicationContext());
 		HOST = "10.0.2.2";
 		input = (EditText) findViewById(R.id.textInput);
 		align = (TextView) findViewById(R.id.textViewAlign);
+		scoreBar = (ProgressBar)findViewById(R.id.scoreBar);
 		translateButton = (Button) findViewById(R.id.translateButton);
 		input.setText("we r meeting 2nite ?");
 		output = (TextView) findViewById(R.id.textViewTranslated);
@@ -188,7 +193,7 @@ public class TranslatorActivity extends Activity implements OnInitListener {
 					String inp[] = inFromServer.readLine().split("##");
 					translatedSentence = inp[XLATION_INDEX];
 					currNormed = inp[NORMED_INDEX];
-					double score = Double.parseDouble(inp[SCORE_INDEX]);
+					currScore = Double.parseDouble(inp[SCORE_INDEX]);
 					Log.d("Got from server :", inp[0]);
 					publishProgress("" + 50);
 					String inputWords[] = currNormed.split(" ");
@@ -313,6 +318,16 @@ public class TranslatorActivity extends Activity implements OnInitListener {
 										+ ori.toString() + "<br/>"
 										+ trans.toString()),
 								TextView.BufferType.SPANNABLE);
+						
+						//Show the score
+						if(currScore < -150) { //Too bad
+							currScore = 20;
+						} else {
+							currScore += 150;
+						}
+						currScore = (currScore / 150) * 100;
+						scoreBar.setProgress((int)currScore);
+						
 					}
 
 				}
