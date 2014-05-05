@@ -170,18 +170,20 @@ public final class R {
     }
     public static final class drawable {
         public static final int ic_launcher=0x7f020000;
+        public static final int pbar=0x7f020001;
     }
     public static final class id {
-        public static final int action_settings=0x7f0b0008;
-        public static final int add_translation=0x7f0b0006;
-        public static final int cache=0x7f0b0005;
-        public static final int menu_settings=0x7f0b0009;
-        public static final int speakButton=0x7f0b0004;
-        public static final int stored_translations=0x7f0b0007;
+        public static final int action_settings=0x7f0b0009;
+        public static final int add_translation=0x7f0b0007;
+        public static final int cache=0x7f0b0006;
+        public static final int menu_settings=0x7f0b000a;
+        public static final int scoreBar=0x7f0b0005;
+        public static final int speakButton=0x7f0b0002;
+        public static final int stored_translations=0x7f0b0008;
         public static final int textInput=0x7f0b0000;
         public static final int textViewAlign=0x7f0b0003;
-        public static final int textViewTranslated=0x7f0b0001;
-        public static final int translateButton=0x7f0b0002;
+        public static final int textViewTranslated=0x7f0b0004;
+        public static final int translateButton=0x7f0b0001;
     }
     public static final class layout {
         public static final int activity_main=0x7f030000;
